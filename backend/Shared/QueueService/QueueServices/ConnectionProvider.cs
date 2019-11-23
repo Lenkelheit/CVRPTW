@@ -13,6 +13,7 @@ namespace QueueService.QueueServices
             this.connectionFactory = connectionFactory;
         }
         
+        
         // METHODS
         public Interfaces.IConsumer Connect(Models.Settings settings)
         {
