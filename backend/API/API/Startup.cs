@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+using API.Infrastructure;
+
 namespace API
 {
     public class Startup
@@ -17,6 +19,8 @@ namespace API
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSwagger(Configuration);
+            services.AddBusinessLogicServices(Configuration);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
@@ -31,6 +35,7 @@ namespace API
                 app.UseHsts();
             }
 
+            app.UseSwagger();
             app.UseHttpsRedirection();
             app.UseMvc();
         }

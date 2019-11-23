@@ -1,4 +1,6 @@
-﻿using QueueService.Interfaces;
+﻿using Newtonsoft.Json;
+
+using QueueService.Interfaces;
 using QueueService.Models;
 
 using RabbitMQ.Client;
@@ -10,12 +12,12 @@ namespace QueueService.QueueServices
         // FIELDS
         private readonly PublicationAddress publicationAddress;
 
-        private IBroker connectionLine;
+        private IBroker broker;
 
         // CONSTRUCTORS
         public Producer(IConnectionFactory connectionFactory, Settings settings)
         {
-            this.connectionLine = new Broker(connectionFactory, settings);            
+            this.broker = new Broker(connectionFactory, settings);            
 
             this.publicationAddress = new PublicationAddress(
                     settings.ExchangeType,
@@ -25,11 +27,11 @@ namespace QueueService.QueueServices
         
         public void Dispose()
         {
-            connectionLine?.Dispose();
+            broker?.Dispose();
         }
 
         // PROPERTIES
-        public IModel Channel => connectionLine.Channel;
+        public IModel Channel => broker.Channel;
 
         // METHODS
         public void Send(string message)
@@ -37,6 +39,10 @@ namespace QueueService.QueueServices
             byte[] body = System.Text.Encoding.UTF8.GetBytes(message);
 
             Channel.BasicPublish(publicationAddress, null, body);
+        }
+        public void Send<TModel>(TModel model)
+        {
+            this.Send(JsonConvert.SerializeObject(model));
         }
 
     }

@@ -1,6 +1,6 @@
 ﻿namespace QueueService.Interfaces
 {
-    public interface IBroker : System.IDisposable
+    internal interface IBroker : System.IDisposable
     {
         RabbitMQ.Client.IModel Channel { get; }
         
