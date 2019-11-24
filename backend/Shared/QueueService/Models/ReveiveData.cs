@@ -1,4 +1,6 @@
-﻿namespace QueueService.Models
+﻿using Newtonsoft.Json;
+
+namespace QueueService.Models
 {
     /// <summary>
     /// The data that Consumer receive
@@ -7,5 +9,10 @@
     {
         public ulong DeliveryTag { get; set; }
         public string Message { get; set; }
+
+        public TModel GetObject<TModel>()
+        {
+            return JsonConvert.DeserializeObject<TModel>(Message);
+        }
     }
 }

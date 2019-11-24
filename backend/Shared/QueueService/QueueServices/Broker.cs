@@ -2,7 +2,7 @@
 
 namespace QueueService.QueueServices
 {
-    public class Broker : Interfaces.IBroker
+    internal class Broker : Interfaces.IBroker
     {
         // FIELDS
         private readonly IConnection connection;
