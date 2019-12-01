@@ -1,4 +1,4 @@
-# CVRPWT
+# CVRPTW
 
 **Capacitated Vehicle Routing Problem with Time Windows** — розв'язок проблеми оптимізації руху із врахуванням вмістимості транспортних засобів та часовими обмеженнями за допомогою OR-Tools
 
