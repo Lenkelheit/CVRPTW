@@ -1,6 +1,6 @@
 # CVRPWT
 
-Capacitated Vehicle Routing Problem with Time Windows — розв'язок проблеми оптимізації руху із врахуванням вмістимості транспортних засобів та часовими обмеженнями за допомогою OR-Tools
+**Capacitated Vehicle Routing Problem with Time Windows** — розв'язок проблеми оптимізації руху із врахуванням вмістимості транспортних засобів та часовими обмеженнями за допомогою OR-Tools
 
 ## Технології:
 
@@ -20,21 +20,24 @@ Capacitated Vehicle Routing Problem with Time Windows — розв'язок пр
 
 ### RabbitMQ
 
-* відкрийте термінал (win + R, "cmd") 
+* відкрийте діалогове вікно виконання команд ``win + R`` 
+* відкрийте термінал, введіть ``cmd`` 
 * перейдіть в папку з RabbitMQ ``cd C:\Program Files\RabbitMQ Server\rabbitmq_server-***\sbin``
 * запускаємо сервіс ``rabbitmq-service.bat start`
 * при потребі переходимо на management сторінку http://localhost:15672, логін та пароль — **guest**
 
 ### OR-Tools
 
-* відкрийте термінал (win + R, "cmd") 
+* відкрийте діалогове вікно виконання команд ``win + R`` 
+* відкрийте термінал, введіть ``cmd`` 
 * перейдіть в папку з OR-Tools ``cd **\CVRPTW\backend\OR-Tools``
 * будуємо проект ``dotnet build``
 * запускаємо сервіс ``dotnet run --project OR-Tools``
 
 ### API
 
-* відкрийте термінал (win + R, "cmd") 
+* відкрийте діалогове вікно виконання команд ``win + R`` 
+* відкрийте термінал, введіть ``cmd`` 
 * перейдіть в папку з API ``cd **\CVRPTW\backend\API``
 * будуємо проект ``dotnet build``
 * запускаємо сервіс ``dotnet run --project API``
@@ -42,7 +45,8 @@ Capacitated Vehicle Routing Problem with Time Windows — розв'язок пр
 
 ### Angular
 
-* відкрийте термінал (win + R, "cmd") 
+* відкрийте діалогове вікно виконання команд ``win + R`` 
+* відкрийте термінал, введіть ``cmd`` 
 * перейдіть в папку з клієнтом ``cd **\CVRPTW\frontend\Angular``
 * встановлюємо пакети ``npm install``
 * запускаємо сервіс ``ng serve``
