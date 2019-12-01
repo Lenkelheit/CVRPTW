@@ -29,7 +29,7 @@ Capacitated Vehicle Routing Problem with Time Windows — розв'язок пр
 
 * відкрийте термінал (win + R, "cmd") 
 * перейдіть в папку з OR-Tools ``cd **\CVRPTW\backend\OR-Tools``
-* будуємо проект ``dotnet build`
+* будуємо проект ``dotnet build``
 * запускаємо сервіс ``dotnet run --project OR-Tools``
 
 ### API
