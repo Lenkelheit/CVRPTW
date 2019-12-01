@@ -23,7 +23,7 @@
 * відкрийте діалогове вікно виконання команд ``win + R`` 
 * відкрийте термінал, введіть ``cmd`` 
 * перейдіть в папку з RabbitMQ ``cd C:\Program Files\RabbitMQ Server\rabbitmq_server-***\sbin``
-* запускаємо сервіс ``rabbitmq-service.bat start`
+* запускаємо сервіс ``rabbitmq-service.bat start``
 * при потребі переходимо на management сторінку http://localhost:15672, логін та пароль — **guest**
 
 ### OR-Tools
