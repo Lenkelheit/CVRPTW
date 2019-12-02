@@ -21,7 +21,6 @@ namespace API.Controllers.Services
             {
                 Distances = excelMapper.Fetch<Distances>(nameof(Distances)).ToArray(),
                 Locations = excelMapper.Fetch<Locations>(nameof(Locations)).ToArray(),
-                Orders = excelMapper.Fetch<Orders>(nameof(Orders)).ToArray(),
                 Vehicles = excelMapper.Fetch<Vehicles>(nameof(Vehicles)).ToArray()
             };
         }
