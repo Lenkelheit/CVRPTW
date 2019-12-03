@@ -19,7 +19,7 @@ namespace API.Infrastructure
 
         public static void AddBackgroundsServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddHostedService<MessageService>();
+            services.AddHostedService<IsSolvedService>();
         }
 
         #region Swagger

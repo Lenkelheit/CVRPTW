@@ -49,7 +49,7 @@ namespace API
 
             app.UseSignalR(routes =>
             {
-                routes.MapHub<Hubs.MessageHub>("/solved");
+                routes.MapHub<Hubs.OrToolsHub>("/or-tools");
             });
         }
     }

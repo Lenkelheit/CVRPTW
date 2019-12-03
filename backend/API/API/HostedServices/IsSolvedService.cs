@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace API.HostedServices
 {
-    public class MessageService : BackgroundService
+    public class IsSolvedService : BackgroundService
     {
-        IHubContext<Hubs.MessageHub> hubContext;
+        IHubContext<Hubs.OrToolsHub> hubContext;
 
-        public MessageService(IHubContext<Hubs.MessageHub> hubContext)
+        public IsSolvedService(IHubContext<Hubs.OrToolsHub> hubContext)
         {
             this.hubContext = hubContext;
         }
