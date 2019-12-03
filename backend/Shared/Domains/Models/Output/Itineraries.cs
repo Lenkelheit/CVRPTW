@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 
 namespace Domains.Models.Output
 {
@@ -6,9 +7,13 @@ namespace Domains.Models.Output
     {
         [DisplayName("Vehicle name")]
         public string VehicleName { get; set; }
-        [DisplayName("Order name")]
-        public string OrderName { get; set; }
-        [DisplayName("Location name")]
-        public string LocationName { get; set; }
+        [DisplayName("Load")]
+        public int Load { get; set; }
+        [DisplayName("Location min time")]
+        public DateTime From  { get; set; }
+        [DisplayName("Location max time")]
+        public DateTime To { get; set; }
+        [DisplayName("Distance")]
+        public int Distance { get; set; }
     }
 }

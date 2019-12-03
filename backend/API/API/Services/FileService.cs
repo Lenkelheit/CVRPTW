@@ -30,7 +30,9 @@ namespace API.Controllers.Services
             using (ExcelPackage excel = new ExcelPackage())
             {
                 AddWorksheet(fileOutput.Summaries, excel);
+                AddWorksheet(fileOutput.Totals, excel);
                 AddWorksheet(fileOutput.Itineraries, excel);
+                AddWorksheet(fileOutput.DroppedLocation, excel);
 
                 return excel.GetAsByteArray();
             }
