@@ -27,6 +27,8 @@ namespace API
         {
             services.AddSwagger(Configuration);
             services.AddBusinessLogicServices(Configuration);
+            services.AddBackgroundsServices(Configuration);
+            services.AddSignalR();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
@@ -45,6 +47,10 @@ namespace API
             app.UseHttpsRedirection();
             app.UseMvc();
 
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<Hubs.MessageHub>("/solved");
+            });
         }
     }
 }

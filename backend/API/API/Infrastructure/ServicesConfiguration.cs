@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Swashbuckle.AspNetCore.Swagger;
 
+using API.HostedServices;
 using API.Controllers.Services;
 using API.Infrastructure.Swagger;
 
@@ -14,6 +15,11 @@ namespace API.Infrastructure
         public static void AddBusinessLogicServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<FileService>();
+        }
+
+        public static void AddBackgroundsServices(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddHostedService<MessageService>();
         }
 
         #region Swagger
