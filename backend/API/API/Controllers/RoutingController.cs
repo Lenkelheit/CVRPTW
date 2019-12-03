@@ -50,56 +50,71 @@ namespace API.Controllers
         }
         private FileOutput MockData()
         {
-            Summary[] summaries = new Summary[]
+            Summary[] summaries = new []
             {
                 new Summary
                 {
-                    MaxVolume = 50,
-                    MaxWeight = 50,
-                    NumberOfUnassignedOrders = 50,
+                    VehicleName = "v1",
+                    Distance = 122,
+                    Load = 15,
                     NumberOfVisits = 5,
-                    TotalDistance = 45,
-                    ServiceTime = System.DateTime.ParseExact("05:21:50","H:m:s", null),
-                    TravellingTime = System.DateTime.ParseExact("05:21:50","H:m:s", null),
-                    WaitingTime = System.DateTime.ParseExact("05:21:50","H:m:s", null),
-                    VehicleName = "v1"
+                    Time = 45
                 },
 
                 new Summary
                 {
-                    MaxVolume = 150,
-                    MaxWeight = 5,
-                    NumberOfUnassignedOrders = 450,
+                    VehicleName = "v2",
+                    Distance = 122,
+                    Load = 15,
                     NumberOfVisits = 5,
-                    TotalDistance = 45,
-                    ServiceTime = System.DateTime.ParseExact("05:21:50","H:m:s", null),
-                    TravellingTime = System.DateTime.ParseExact("05:21:50","H:m:s", null),
-                    WaitingTime = System.DateTime.ParseExact("05:21:50","H:m:s", null),
-                    VehicleName = "v2"
+                    Time = 45
                 }
             };
 
-            Itineraries[] itineraries = new Itineraries[]
+            Itineraries[] itineraries = new []
             {
                 new Itineraries
                 {
-                   LocationName = "Location 1",
-                   OrderName ="Order 1",
-                   VehicleName = "Vehicle 1"
+                   VehicleName = "Vehicle 1",
+                   Distance = 45,
+                   Load = 5,
+                   From = System.DateTime.Now,
+                   To = System.DateTime.Now
                 },
 
                 new Itineraries
                 {
-                   LocationName = "Location 2",
-                   OrderName ="Order 2",
-                   VehicleName = "Vehicle 2"
+                    VehicleName = "Vehicle 2",
+                    Distance = 45,
+                    Load = 5,
+                    From = System.DateTime.Now,
+                    To = System.DateTime.Now
+                }
+            };
+
+            Dropped[] droppedLocations = new[]
+            {
+                new Dropped
+                {
+                    LocationName = "Dropped 1"
+                }
+            };
+            Totals[] totals = new[]
+            {
+                new Totals
+                {
+                    Distance = 45,
+                    Load = 45,
+                    Time = 54
                 }
             };
 
             return new FileOutput
             {
                 Summaries = summaries,
-                Itineraries = itineraries
+                Itineraries = itineraries,
+                DroppedLocation = droppedLocations,
+                Totals = totals
             };
         }
     }
