@@ -12,8 +12,7 @@ namespace OR_Tools
         RoutingModel routing;
         Assignment solution;
         Data data;
-
-        public ORSolver() { }
+        
         public ORSolver(Data data)
         {
             this.data = data;

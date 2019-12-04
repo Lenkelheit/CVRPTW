@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Shared\Domains\Domains.csproj" />
+    <ProjectReference Include="..\..\Shared\QueueService\QueueService.csproj" />
   </ItemGroup>
 
 </Project>
