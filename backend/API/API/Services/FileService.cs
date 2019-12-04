@@ -9,7 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace API.Controllers.Services
+namespace API.Services
 {
     public class FileService
     {

@@ -1,5 +1,5 @@
-﻿using API.Validation;
-using API.Controllers.Services;
+﻿using API.Services;
+using API.Validation;
 
 using Domains.Models.Input;
 using Domains.Models.Output;
@@ -14,10 +14,12 @@ namespace API.Controllers
     public class RoutingController : ControllerBase
     {
         FileService fileService;
+        MessageService messageService;
 
-        public RoutingController(FileService fileService)
+        public RoutingController(FileService fileService, MessageService messageService)
         {
             this.fileService = fileService;
+            this.messageService = messageService;
         }
 
         [HttpPost]
@@ -27,6 +29,8 @@ namespace API.Controllers
             try
             {
                 fileData = fileService.Parse(file.OpenReadStream());
+
+                messageService.SendFileData(fileData);
             }
             catch (System.Exception ex)
             {
@@ -40,82 +44,13 @@ namespace API.Controllers
         public FileContentResult Download()
         {
             string fileName = "Results.xlsx";
-            FileOutput fileOutput = MockData();
+            FileOutput fileOutput = messageService.DequeueData();
             byte[] fileContent = fileService.Save(fileOutput);
 
             return File(
                 fileContent,
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 fileName);
-        }
-        private FileOutput MockData()
-        {
-            Summary[] summaries = new []
-            {
-                new Summary
-                {
-                    VehicleName = "v1",
-                    Distance = 122,
-                    Load = 15,
-                    NumberOfVisits = 5,
-                    Time = 45
-                },
-
-                new Summary
-                {
-                    VehicleName = "v2",
-                    Distance = 122,
-                    Load = 15,
-                    NumberOfVisits = 5,
-                    Time = 45
-                }
-            };
-
-            Itineraries[] itineraries = new []
-            {
-                new Itineraries
-                {
-                   VehicleName = "Vehicle 1",
-                   Distance = 45,
-                   Load = 5,
-                   From = System.DateTime.Now,
-                   To = System.DateTime.Now
-                },
-
-                new Itineraries
-                {
-                    VehicleName = "Vehicle 2",
-                    Distance = 45,
-                    Load = 5,
-                    From = System.DateTime.Now,
-                    To = System.DateTime.Now
-                }
-            };
-
-            Dropped[] droppedLocations = new[]
-            {
-                new Dropped
-                {
-                    LocationName = "Dropped 1"
-                }
-            };
-            Totals[] totals = new[]
-            {
-                new Totals
-                {
-                    Distance = 45,
-                    Load = 45,
-                    Time = 54
-                }
-            };
-
-            return new FileOutput
-            {
-                Summaries = summaries,
-                Itineraries = itineraries,
-                DroppedLocation = droppedLocations,
-                Totals = totals
-            };
         }
     }
 }

@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OR-Tools", "OR-Tools\OR-Too
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueueService", "..\Shared\QueueService\QueueService.csproj", "{5CD12F94-4B35-47D2-B459-79441889CC50}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domains", "..\Shared\Domains\Domains.csproj", "{A1AE2183-CAEE-40F4-8ADB-91CF9D997D1A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{5CD12F94-4B35-47D2-B459-79441889CC50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CD12F94-4B35-47D2-B459-79441889CC50}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5CD12F94-4B35-47D2-B459-79441889CC50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1AE2183-CAEE-40F4-8ADB-91CF9D997D1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1AE2183-CAEE-40F4-8ADB-91CF9D997D1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1AE2183-CAEE-40F4-8ADB-91CF9D997D1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1AE2183-CAEE-40F4-8ADB-91CF9D997D1A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

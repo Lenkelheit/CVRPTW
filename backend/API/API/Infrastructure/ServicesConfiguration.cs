@@ -4,9 +4,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Swashbuckle.AspNetCore.Swagger;
 
+using API.Services;
 using API.HostedServices;
-using API.Controllers.Services;
 using API.Infrastructure.Swagger;
+
+using QueueService.Interfaces;
+using QueueService.QueueServices;
+
+using RabbitMQ.Client;
 
 namespace API.Infrastructure
 {
@@ -15,12 +20,20 @@ namespace API.Infrastructure
         public static void AddBusinessLogicServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<FileService>();
+            services.AddScoped<MessageService>();
         }
 
         public static void AddBackgroundsServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddHostedService<IsSolvedService>();
         }
+
+        public static void AddMessageServices(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddSingleton<IConnectionFactory, DefaultConnectionFactory>();
+            services.AddSingleton<IConnectionProvider, ConnectionProvider>();
+        }
+
 
         #region Swagger
         public static void AddSwagger(this IServiceCollection services, IConfiguration configuration)

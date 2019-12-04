@@ -28,6 +28,7 @@ namespace API
             services.AddSwagger(Configuration);
             services.AddBusinessLogicServices(Configuration);
             services.AddBackgroundsServices(Configuration);
+            services.AddMessageServices(Configuration);
             services.AddSignalR();
             services.AddCors();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
@@ -45,7 +46,7 @@ namespace API
             }
 
             app.UseSwagger();
-            app.UseCors(builder => builder.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:4200"));
+            app.UseCors(builder => builder.AllowAnyMethod().AllowAnyHeader().AllowCredentials().WithOrigins("http://localhost:4200"));
             app.UseMvc();
 
             app.UseSignalR(routes =>

@@ -19,7 +19,9 @@
             Upload sheet
         </button>
 
-        <button class="btn-container btn-success" mat-raised-button color="primary" (click)="downloadFile()">
+        <button class="btn-container btn-success" mat-raised-button color="primary" 
+            [disabled]="!canDownload"
+            (click)="downloadFile()">
             Download results
         </button>
 
