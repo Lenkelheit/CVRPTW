@@ -4,7 +4,7 @@ using System.Text;
 
 namespace OR_Tools
 {
-    class Data
+    public class Data
     {
         public long[,] DistanceMatrix =
         {
