@@ -6,4 +6,8 @@
     <RootNamespace>OR_Tools</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Google.OrTools" Version="7.4.7247" />
+  </ItemGroup>
+
 </Project>
