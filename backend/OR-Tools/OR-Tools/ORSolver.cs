@@ -38,6 +38,7 @@ namespace OR_Tools
 
             // Solve the problem
             Solution = Routing.SolveWithParameters(searchParameters);
+            System.Console.WriteLine("Solved");
         }
         public void CapacityConstrains()
         {
@@ -104,6 +105,12 @@ namespace OR_Tools
 
         public void PrintSolution()
         {
+            if (solution == null)
+            {
+                System.Console.WriteLine("No solution");
+                return;
+            }
+
             RoutingDimension capacityDimension = Routing.GetDimensionOrDie("Capacity");
             RoutingDimension timeDimension = Routing.GetMutableDimension("Time");
 
@@ -125,7 +132,6 @@ namespace OR_Tools
                 }
             }
             Console.WriteLine("{0}\n", droppedNodes);
-            Data data = new Data();
             for (int i = 0; i < data.VehicleNumber; ++i)
             {
                 Console.WriteLine("Route for Vehicle {0}:", i);
