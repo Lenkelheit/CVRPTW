@@ -115,7 +115,12 @@ namespace OR_Tools
                         consumer.SetAcknowledge(receiveData.DeliveryTag, true);
 
                         // solve
-                        FileOutput solved = MockData();
+                        var orToolsConverter = new OrToolsConverter();
+                        var data = orToolsConverter.ConvertToData(fileInput);
+                        var solver = new ORSolver(data);
+                        solver.PrintSolution();
+                        FileOutput solved = orToolsConverter.ConvertToFileOutput(solver);
+
                         System.Threading.Thread.Sleep(2000);
 
                         // put in queue
