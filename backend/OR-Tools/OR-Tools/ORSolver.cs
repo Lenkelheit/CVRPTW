@@ -1,31 +1,32 @@
 ﻿using System;
 using Google.OrTools.ConstraintSolver;
 
+using Domains.Models.Output;
+
 namespace OR_Tools
 {
-    class ORSolver
+    public class ORSolver
     {
-        static readonly long penalty = 1000;
-        const int MaximumTimeForTheCar = 1000;
+        public static readonly long Penalty = 1000;
+        public const int MaximumTimeForTheCar = 120;
 
-        RoutingIndexManager manager;
-        RoutingModel routing;
-        Assignment solution;
-        Data data;
-        
+        public RoutingIndexManager Manager { get; set; }
+        public RoutingModel Routing { get; set; }
+        public Assignment Solution { get; set; }
+        public Data Data { get; set; }
+
         public ORSolver(Data data)
         {
-            this.data = data;
+            this.Data = data;
         }
 
         public void Solve()
         {
             // Create Routing Index Manager
-            manager = new RoutingIndexManager(data.DistanceMatrix.GetLength(0), data.VehicleNumber, data.Starts, data.Ends);
-            //manager = new RoutingIndexManager(data.DistanceMatrix.GetLength(0), data.VehicleNumber, 0);
+            Manager = new RoutingIndexManager(Data.DistanceMatrix.GetLength(0), Data.VehicleNumber, Data.Starts, Data.Ends);
 
             // Create Routing Model
-            routing = new RoutingModel(manager);
+            Routing = new RoutingModel(Manager);
 
             CapacityConstrains();
             PenaltiesAndDroppingVisits();
@@ -36,69 +37,69 @@ namespace OR_Tools
             searchParameters.FirstSolutionStrategy = FirstSolutionStrategy.Types.Value.PathCheapestArc;
 
             // Solve the problem
-            solution = routing.SolveWithParameters(searchParameters);
+            Solution = Routing.SolveWithParameters(searchParameters);
             System.Console.WriteLine("Solved");
         }
         public void CapacityConstrains()
         {
             // Create and register a transit callback
-            int transitCallbackIndex = routing.RegisterTransitCallback(
+            int transitCallbackIndex = Routing.RegisterTransitCallback(
                 (long fromIndex, long toIndex) =>
                 {
                     // Convert from routing variable Index to distance matrix NodeIndex
-                    var fromNode = manager.IndexToNode(fromIndex);
-                    var toNode = manager.IndexToNode(toIndex);
-                    return data.DistanceMatrix[fromNode, toNode];
+                    var fromNode = Manager.IndexToNode(fromIndex);
+                    var toNode = Manager.IndexToNode(toIndex);
+                    return Data.DistanceMatrix[fromNode, toNode];
                 });
 
             // Define cost of each arc.
-            routing.SetArcCostEvaluatorOfAllVehicles(transitCallbackIndex);
+            Routing.SetArcCostEvaluatorOfAllVehicles(transitCallbackIndex);
 
             // Add Capacity constraint
-            int demandCallbackIndex = routing.RegisterUnaryTransitCallback(
+            int demandCallbackIndex = Routing.RegisterUnaryTransitCallback(
               (long fromIndex) =>
               {
-                  var fromNode = manager.IndexToNode(fromIndex);
-                  return data.Demands[fromNode];
+                  var fromNode = Manager.IndexToNode(fromIndex);
+                  return Data.Demands[fromNode];
               });
 
             // AddDimensionWithVehicleCapacity method, which takes a vector of capacities
-            routing.AddDimensionWithVehicleCapacity(demandCallbackIndex, 0, data.VehicleCapacities, true, "Capacity");
+            Routing.AddDimensionWithVehicleCapacity(demandCallbackIndex, 0, Data.VehicleCapacities, true, "Capacity");
         }
         public void TimeWindowConstrains()
         {
-            int transitCallbackIndex = routing.RegisterTransitCallback(
+            int transitCallbackIndex = Routing.RegisterTransitCallback(
                 (long fromIndex, long toIndex) =>
                 {
-                    var fromNode = manager.IndexToNode(fromIndex);
-                    var toNode = manager.IndexToNode(toIndex);
-                    return data.TimeMatrix[fromNode, toNode] + data.ServiceTimes[fromNode];
+                    var fromNode = Manager.IndexToNode(fromIndex);
+                    var toNode = Manager.IndexToNode(toIndex);
+                    return Data.TimeMatrix[fromNode, toNode] + Data.ServiceTimes[fromNode];
                 });
-            routing.AddDimension(transitCallbackIndex, 120, MaximumTimeForTheCar, false, "Time");
+            Routing.AddDimension(transitCallbackIndex, 120, MaximumTimeForTheCar, false, "Time");
 
-            RoutingDimension timeDimension = routing.GetDimensionOrDie("Time");
+            RoutingDimension timeDimension = Routing.GetDimensionOrDie("Time");
             // Add time window constraints for each location except depot
-            for (int i = 1; i < data.TimeWindows.GetLength(0); ++i)
+            for (int i = 1; i < Data.TimeWindows.GetLength(0); ++i)
             {
-                long index = manager.NodeToIndex(i);
-                timeDimension.CumulVar(index).SetRange(data.TimeWindows[i, 0], data.TimeWindows[i, 1]);
+                long index = Manager.NodeToIndex(i);
+                timeDimension.CumulVar(index).SetRange(Data.TimeWindows[i, 0], Data.TimeWindows[i, 1]);
             }
             // Add time window constraints for each vehicle start node
-            for (int i = 0; i < data.VehicleNumber; ++i)
+            for (int i = 0; i < Data.VehicleNumber; ++i)
             {
-                long index = routing.Start(i);
-                timeDimension.CumulVar(index).SetRange(data.TimeWindows[0, 0], data.TimeWindows[0, 1]);
+                long index = Routing.Start(i);
+                timeDimension.CumulVar(index).SetRange(Data.TimeWindows[0, 0], Data.TimeWindows[0, 1]);
 
-                routing.AddVariableMinimizedByFinalizer(timeDimension.CumulVar(routing.Start(i)));
-                routing.AddVariableMinimizedByFinalizer(timeDimension.CumulVar(routing.End(i)));
+                Routing.AddVariableMinimizedByFinalizer(timeDimension.CumulVar(Routing.Start(i)));
+                Routing.AddVariableMinimizedByFinalizer(timeDimension.CumulVar(Routing.End(i)));
             }
         }
         public void PenaltiesAndDroppingVisits()
         {
             // Allow to drop nodes.
-            for (int i = 1; i < data.DistanceMatrix.GetLength(0); ++i)
+            for (int i = 1; i < Data.DistanceMatrix.GetLength(0); ++i)
             {
-                routing.AddDisjunction(new long[] { manager.NodeToIndex(i) }, penalty);
+                Routing.AddDisjunction(new long[] { Manager.NodeToIndex(i) }, Penalty);
             }
         }
 
@@ -110,8 +111,8 @@ namespace OR_Tools
                 return;
             }
 
-            RoutingDimension capacityDimension = routing.GetDimensionOrDie("Capacity");
-            RoutingDimension timeDimension = routing.GetMutableDimension("Time");
+            RoutingDimension capacityDimension = Routing.GetDimensionOrDie("Capacity");
+            RoutingDimension timeDimension = Routing.GetMutableDimension("Time");
 
             long totalLoad = 0;
             long totalTime = 0;
@@ -119,15 +120,15 @@ namespace OR_Tools
 
             // Display dropped nodes.
             string droppedNodes = "Dropped nodes:";
-            for (int index = 0; index < routing.Size(); ++index)
+            for (int index = 0; index < Routing.Size(); ++index)
             {
-                if (routing.IsStart(index) || routing.IsEnd(index))
+                if (Routing.IsStart(index) || Routing.IsEnd(index))
                 {
                     continue;
                 }
-                if (solution.Value(routing.NextVar(index)) == index)
+                if (Solution.Value(Routing.NextVar(index)) == index)
                 {
-                    droppedNodes += " " + manager.IndexToNode(index);
+                    droppedNodes += " " + Manager.IndexToNode(index);
                 }
             }
             Console.WriteLine("{0}\n", droppedNodes);
@@ -136,32 +137,33 @@ namespace OR_Tools
                 Console.WriteLine("Route for Vehicle {0}:", i);
                 long load = 0;
                 long routeDistance = 0;
-                var index = routing.Start(i);
+                var index = Routing.Start(i);
 
-                while (routing.IsEnd(index) == false)
+                while (Routing.IsEnd(index) == false)
                 {
-                    load = solution.Value(capacityDimension.CumulVar(index));
+                    load = Solution.Value(capacityDimension.CumulVar(index));
                     var timeVar = timeDimension.CumulVar(index);
 
-                    Console.Write("{0} Load({1}) Time({2},{3}) -> ", manager.IndexToNode(index), load, solution.Min(timeVar), solution.Max(timeVar));
+                    Console.Write("{0} Load({1}) Time({2},{3}) -> ", Manager.IndexToNode(index), load, Solution.Min(timeVar), Solution.Max(timeVar));
 
                     var previousIndex = index;
-                    index = solution.Value(routing.NextVar(index));
-                    routeDistance += routing.GetArcCostForVehicle(previousIndex, index, 0);
+                    index = Solution.Value(Routing.NextVar(index));
+                    routeDistance += Routing.GetArcCostForVehicle(previousIndex, index, 0);
                 }
 
-                load = solution.Value(capacityDimension.CumulVar(index));
+                load = Solution.Value(capacityDimension.CumulVar(index));
                 var endTimeVar = timeDimension.CumulVar(index);
 
-                Console.WriteLine("{0} Load({1}) Time({2},{3})", manager.IndexToNode(index), load, solution.Min(endTimeVar), solution.Max(endTimeVar));
+                Console.WriteLine("{0} Load({1}) Time({2},{3})", Manager.IndexToNode(index), load, Solution.Min(endTimeVar), Solution.Max(endTimeVar));
                 Console.WriteLine("Load the route: {0}", load);
-                Console.WriteLine("Time of the route: {0}min", solution.Min(endTimeVar));
+                Console.WriteLine("Time of the route: {0}min", Solution.Min(endTimeVar));
                 Console.WriteLine("Distance of the route: {0}m\n", routeDistance);
 
                 totalLoad += load;
-                totalTime += solution.Min(endTimeVar);
+                totalTime += Solution.Min(endTimeVar);
                 totalDistance += routeDistance;
             }
+
             Console.WriteLine("Total Load of all routes: {0}", totalLoad);
             Console.WriteLine("Total Time of all routes: {0}min", totalTime);
             Console.WriteLine("Total Distance of all routes: {0}m", totalDistance);
