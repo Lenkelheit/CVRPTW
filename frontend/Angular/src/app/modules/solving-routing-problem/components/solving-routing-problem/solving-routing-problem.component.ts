@@ -14,9 +14,8 @@ export class SolvingRoutingProblemComponent implements OnInit, OnDestroy {
     private hubConnection: HubConnection;
 
     public columnsToDisplay: string[] = ['id', 'name'];
-    public data = [];
+    public vehicles = [];
 
-    
     public ToDisplay: string[] = ['id', 'name'];
     public locations = [];
 
@@ -26,17 +25,20 @@ export class SolvingRoutingProblemComponent implements OnInit, OnDestroy {
     constructor(public fileOperationService: FileOperationService, public snackBar: MatSnackBar) { }
 
     public ngOnInit() {
-        this.openNotificationBar();
         this.registerHub();
     }
 
     private registerHub() {
         this.hubConnection = new HubConnectionBuilder().withUrl('http://localhost:5000/or-tools').build();
-        this.hubConnection.start().catch((error) =>
-        console.log('isSolved', error));
+        this.hubConnection.start().catch((error) => {
+            console.log('isSolved', error);
+
+            this.openNotificationBar('Error occurred with connection to server.', 'notification-error');
+        });
 
         this.hubConnection.on('IsSolved', (isSolved: boolean) => {
             this.canDownload = isSolved;
+            this.openNotificationBar('Success! Results are ready for downloading.', 'notification-success');
             console.log('isSolved', isSolved);
         });
     }
@@ -55,17 +57,23 @@ export class SolvingRoutingProblemComponent implements OnInit, OnDestroy {
 
     public uploadFile() {
         this.fileOperationService.uploadFile(this.fileToUpload).subscribe(dataResp => {
-            this.data = dataResp.body.vehicles;
+            this.vehicles = dataResp.body.vehicles;
             this.locations = dataResp.body.locations;
             console.log(dataResp.body);
-        });
+        },
+            () =>
+                this.openNotificationBar('Error occurred with uploading file.', 'notification-error')
+        );
     }
 
     public downloadFile() {
         this.fileOperationService.downloadFile('blob').subscribe(fileResp => {
             this.saveAs(fileResp.body, 'Results.xlsx');
             this.canDownload = false;
-        });
+        },
+            () =>
+                this.openNotificationBar('Error occurred with downloading file.', 'notification-error')
+        );
     }
 
     private saveAs(blob: Blob, fileName: string) {
@@ -79,10 +87,11 @@ export class SolvingRoutingProblemComponent implements OnInit, OnDestroy {
         document.body.removeChild(link);
     }
 
-    private openNotificationBar() {
+    private openNotificationBar(message: string, panelClass: string) {
         this.snackBar.openFromComponent(NotificationBarComponent, {
+            data: message,
             duration: 10000,
-            panelClass: ['notification-success'],
+            panelClass: [panelClass],
             horizontalPosition: 'end'
         });
     }
