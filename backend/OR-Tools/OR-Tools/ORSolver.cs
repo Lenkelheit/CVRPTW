@@ -6,7 +6,7 @@ namespace OR_Tools
     class ORSolver
     {
         static readonly long penalty = 1000;
-        const int MaximumTimeForTheCar = 120;
+        const int MaximumTimeForTheCar = 1000;
 
         RoutingIndexManager manager;
         RoutingModel routing;
@@ -22,6 +22,7 @@ namespace OR_Tools
         {
             // Create Routing Index Manager
             manager = new RoutingIndexManager(data.DistanceMatrix.GetLength(0), data.VehicleNumber, data.Starts, data.Ends);
+            //manager = new RoutingIndexManager(data.DistanceMatrix.GetLength(0), data.VehicleNumber, 0);
 
             // Create Routing Model
             routing = new RoutingModel(manager);
@@ -36,6 +37,7 @@ namespace OR_Tools
 
             // Solve the problem
             solution = routing.SolveWithParameters(searchParameters);
+            System.Console.WriteLine("Solved");
         }
         public void CapacityConstrains()
         {
@@ -102,6 +104,12 @@ namespace OR_Tools
 
         public void PrintSolution()
         {
+            if (solution == null)
+            {
+                System.Console.WriteLine("No solution");
+                return;
+            }
+
             RoutingDimension capacityDimension = routing.GetDimensionOrDie("Capacity");
             RoutingDimension timeDimension = routing.GetMutableDimension("Time");
 
@@ -123,7 +131,6 @@ namespace OR_Tools
                 }
             }
             Console.WriteLine("{0}\n", droppedNodes);
-            Data data = new Data();
             for (int i = 0; i < data.VehicleNumber; ++i)
             {
                 Console.WriteLine("Route for Vehicle {0}:", i);
