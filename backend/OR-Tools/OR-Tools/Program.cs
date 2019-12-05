@@ -6,81 +6,13 @@ using QueueService.Models;
 using QueueService.QueueServices;
 using RabbitMQ.Client;
 using System;
+using System.Collections.Generic;
 
 namespace OR_Tools
 {
     class Program
     {
-
-        private static FileOutput MockData()
-        {
-            Summary[] summaries = new[]
-            {
-                new Summary
-                {
-                    VehicleName = "v1",
-                    Distance = 122,
-                    Load = 15,
-                    NumberOfVisits = 5,
-                    Time = 45
-                },
-
-                new Summary
-                {
-                    VehicleName = "v2",
-                    Distance = 122,
-                    Load = 15,
-                    NumberOfVisits = 5,
-                    Time = 45
-                }
-            };
-
-            Itineraries[] itineraries = new[]
-            {
-                new Itineraries
-                {
-                   VehicleName = "Vehicle 1",
-                   Distance = 45,
-                   Load = 5,
-                   From = System.DateTime.Now,
-                   To = System.DateTime.Now
-                },
-
-                new Itineraries
-                {
-                    VehicleName = "Vehicle 2",
-                    Distance = 45,
-                    Load = 5,
-                    From = System.DateTime.Now,
-                    To = System.DateTime.Now
-                }
-            };
-
-            Dropped[] droppedLocations = new[]
-            {
-                new Dropped
-                {
-                    LocationName = "Dropped 1"
-                }
-            };
-            Totals[] totals = new[]
-            {
-                new Totals
-                {
-                    Distance = 45,
-                    Load = 45,
-                    Time = 54
-                }
-            };
-
-            return new FileOutput
-            {
-                Summaries = summaries,
-                Itineraries = itineraries,
-                DroppedLocation = droppedLocations,
-                Totals = totals
-            };
-        }
+        
         static void Main(string[] args)
         {
             IConfiguration configuration = new ConfigurationBuilder()
@@ -118,10 +50,15 @@ namespace OR_Tools
                         var orToolsConverter = new OrToolsConverter();
                         var data = orToolsConverter.ConvertToData(fileInput);
                         var solver = new ORSolver(data);
-                        solver.PrintSolution();
-                        FileOutput solved = orToolsConverter.ConvertToFileOutput(solver);
-
-                        System.Threading.Thread.Sleep(2000);
+                        solver.Solve();
+                        bool hasSolution = solver.PrintSolution();
+                        FileOutput solved = hasSolution ? orToolsConverter.ConvertToFileOutput(solver) : new FileOutput()
+                        {
+                            DroppedLocation = new List<Dropped>(),
+                            Itineraries = new List<Itineraries>(),
+                            Summaries = new List<Summary>(),
+                            Totals = new List<Totals>()
+                        };
 
                         // put in queue
                         producerIsSolved.Send(true);

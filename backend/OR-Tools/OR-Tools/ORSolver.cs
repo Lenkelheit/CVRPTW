@@ -8,7 +8,7 @@ namespace OR_Tools
     public class ORSolver
     {
         public static readonly long Penalty = 1000;
-        public const int MaximumTimeForTheCar = 120;
+        public const int MaximumTimeForTheCar = 1000;
 
         public RoutingIndexManager Manager { get; set; }
         public RoutingModel Routing { get; set; }
@@ -24,6 +24,7 @@ namespace OR_Tools
         {
             // Create Routing Index Manager
             Manager = new RoutingIndexManager(Data.DistanceMatrix.GetLength(0), Data.VehicleNumber, Data.Starts, Data.Ends);
+            // Manager = new RoutingIndexManager(Data.DistanceMatrix.GetLength(0), Data.VehicleNumber, 0);
 
             // Create Routing Model
             Routing = new RoutingModel(Manager);
@@ -103,12 +104,12 @@ namespace OR_Tools
             }
         }
 
-        public void PrintSolution()
+        public bool PrintSolution()
         {
-            if (solution == null)
+            if (Solution == null)
             {
                 System.Console.WriteLine("No solution");
-                return;
+                return false;
             }
 
             RoutingDimension capacityDimension = Routing.GetDimensionOrDie("Capacity");
@@ -132,7 +133,7 @@ namespace OR_Tools
                 }
             }
             Console.WriteLine("{0}\n", droppedNodes);
-            for (int i = 0; i < data.VehicleNumber; ++i)
+            for (int i = 0; i < Data.VehicleNumber; ++i)
             {
                 Console.WriteLine("Route for Vehicle {0}:", i);
                 long load = 0;
@@ -167,6 +168,7 @@ namespace OR_Tools
             Console.WriteLine("Total Load of all routes: {0}", totalLoad);
             Console.WriteLine("Total Time of all routes: {0}min", totalTime);
             Console.WriteLine("Total Distance of all routes: {0}m", totalDistance);
+            return true;
         }
     }
 }

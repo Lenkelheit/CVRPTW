@@ -54,7 +54,7 @@ namespace API.Services
                 .Where(a => a.PropertyType == typeof(DateTime))
                 .Select(a => a.index)
                 .ToList()
-                .ForEach(colIndex => workSheet.Cells[FromRow: 2, ToRow: results.Count + 1, FromCol: colIndex + 1, ToCol: colIndex + 1].Style.Numberformat.Format = "dd HH:mm:ss");
+                .ForEach(colIndex => workSheet.Cells[FromRow: 2, ToRow: results.Count + 1, FromCol: colIndex + 1, ToCol: colIndex + 1].Style.Numberformat.Format = "HH:mm:ss");
         }
         #endregion
     }
