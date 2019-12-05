@@ -13,29 +13,13 @@ export class SolvingRoutingProblemComponent implements OnInit, OnDestroy {
 
     private hubConnection: HubConnection;
 
-    public columnsToDisplay: string[] = ['vehicleName', 'orderName', 'locationName'];
-    public data = [
-        {
-            vehicleName: 'Vehicle 1',
-            orderName: 'Order 1',
-            locationName: 'Store 1'
-        },
-        {
-            vehicleName: 'Vehicle 2',
-            orderName: 'Order 2',
-            locationName: 'Store 2'
-        },
-        {
-            vehicleName: 'Vehicle 3',
-            orderName: 'Order 3',
-            locationName: 'Store 3'
-        },
-        {
-            vehicleName: 'Vehicle 3',
-            orderName: 'Order 3',
-            locationName: 'Store 3'
-        }
-    ];
+    public columnsToDisplay: string[] = ['id', 'name'];
+    public data = [];
+
+    
+    public ToDisplay: string[] = ['id', 'name'];
+    public locations = [];
+
     public fileToUpload: File;
     public canDownload: boolean;
 
@@ -71,6 +55,8 @@ export class SolvingRoutingProblemComponent implements OnInit, OnDestroy {
 
     public uploadFile() {
         this.fileOperationService.uploadFile(this.fileToUpload).subscribe(dataResp => {
+            this.data = dataResp.body.vehicles;
+            this.locations = dataResp.body.locations;
             console.log(dataResp.body);
         });
     }

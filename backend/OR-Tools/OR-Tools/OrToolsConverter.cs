@@ -12,6 +12,8 @@ namespace OR_Tools
     {
         private IList<string> locationsNames;
         private IList<string> vehiclesNames;
+        private DateTime minDate;
+
 
         public Data ConvertToData(FileInput fileInput)
         {
@@ -57,6 +59,7 @@ namespace OR_Tools
 
             var locationIndex = 0;
             DateTime minTime = fileInput.Locations.Select(l => l.From).Min();
+            minDate = minTime;
             foreach (var location in fileInput.Locations)
             {
                 data.TimeWindows[locationIndex, 0] = ToMinutes(minTime);
@@ -83,7 +86,13 @@ namespace OR_Tools
 
         public FileOutput ConvertToFileOutput(ORSolver orSolver)
         {
-            var fileOutput = new FileOutput();
+            var fileOutput = new FileOutput()
+            {
+                DroppedLocation = new List<Dropped>(),
+                Itineraries = new List<Itineraries>(),
+                Summaries = new List<Summary>(),
+                Totals = new List<Totals>()
+            };
 
             RoutingDimension capacityDimension = orSolver.Routing.GetDimensionOrDie("Capacity");
             RoutingDimension timeDimension = orSolver.Routing.GetMutableDimension("Time");
@@ -103,7 +112,7 @@ namespace OR_Tools
                 }
             }
 
-            Data data = new Data();
+            Data data = orSolver.Data;
             for (int i = 0; i < data.VehicleNumber; ++i)
             {
                 Console.WriteLine("Route for Vehicle {0}:", i);
@@ -117,8 +126,6 @@ namespace OR_Tools
                     load = orSolver.Solution.Value(capacityDimension.CumulVar(index));
                     var timeVar = timeDimension.CumulVar(index);
 
-                    // Need use next line for converting 'From' and 'To' properties of 'Itineraries'.
-                    Console.Write("{0} Load({1}) Time({2},{3}) -> ", orSolver.Manager.IndexToNode(index), load, orSolver.Solution.Min(timeVar), orSolver.Solution.Max(timeVar));
 
                     var previousIndex = index;
                     index = orSolver.Solution.Value(orSolver.Routing.NextVar(index));
@@ -127,7 +134,13 @@ namespace OR_Tools
                     routeDistance += itinerariesDistance;
 
                     // Need convert for 'From' and 'To'.
-                    fileOutput.Itineraries.Add(new Itineraries { VehicleName = vehiclesNames[i], Load = (int)load, Distance = (int)itinerariesDistance });
+                    fileOutput.Itineraries.Add(new Itineraries {
+                        VehicleName = vehiclesNames[i],
+                        Load = (int)load,
+                        Distance = (int)itinerariesDistance,
+                        From = minDate.AddMinutes(orSolver.Solution.Min(timeVar)),
+                        To = minDate.AddMinutes(orSolver.Solution.Max(timeVar))
+                    });
                     ++numberOfVisits;
                 }
 
