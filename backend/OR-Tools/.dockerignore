@@ -1,0 +1,7 @@
+**/.dockerignore
+**/.vs
+**/.vscode
+**/bin
+**/obj
+**/Dockerfile
+**/appveyor.yml

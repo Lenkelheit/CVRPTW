@@ -1,0 +1,15 @@
+.dockerignore
+.env
+.git
+.gitignore
+.vs
+.vscode
+docker-compose*.yml
+*.md
+LICENSE
+**/bin/
+**/obj/
+**/node_modules/
+**/bower_components/
+**/wwwroot/
+/docs/

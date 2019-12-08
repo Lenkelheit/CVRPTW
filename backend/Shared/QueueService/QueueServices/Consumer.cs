@@ -10,19 +10,19 @@ namespace QueueService.QueueServices
     public class Consumer : IConsumer
     {
         // FIELDS        
-        private ISubscription subscription;
-        private IBroker connectionLine;
+        private readonly ISubscription subscription;
+        private readonly IBroker broker;
 
         // CONSTRUCTORS
         public Consumer(IConnectionFactory connectionFactory, Settings settings)
         {
-            this.connectionLine = new Broker(connectionFactory, settings);                        
+            this.broker = new Broker(connectionFactory, settings);                        
 
-            this.subscription = new Subscription(connectionLine.Channel, settings.QueueName, autoAck: false);
+            this.subscription = new Subscription(broker.Channel, settings.QueueName, autoAck: false);
         }
         public void Dispose()
         {
-            connectionLine?.Dispose();
+            broker?.Dispose();
             subscription?.Dispose();
         }
 
@@ -31,11 +31,11 @@ namespace QueueService.QueueServices
         {
             if (processed)
             {
-                connectionLine.Channel.BasicAck(deliveryTag, false);
+                broker.Channel.BasicAck(deliveryTag, false);
             }
             else
             {
-                connectionLine.Channel.BasicNack(deliveryTag, multiple: false, requeue: true);
+                broker.Channel.BasicNack(deliveryTag, multiple: false, requeue: true);
             }
         }
 

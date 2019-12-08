@@ -1,0 +1,76 @@
+<div class="content">
+
+    <div class="flex-container">
+        <p>{{ fileToUpload?.name }}</p>
+
+        <input id="fileInput" hidden type="file" 
+            (change)="selectFile($event.target.files)"
+            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+
+    </div>
+
+    <!--buttons-->
+    <div class="flex-container">
+
+        <button class="btn-container" mat-raised-button (click)="openFileInput()">
+            Select file to upload
+        </button>
+
+        <button class="btn-container" mat-raised-button color="primary" 
+            [disabled]="!fileToUpload"
+            (click)="uploadFile()">
+            Upload sheet
+        </button>
+
+        <button class="btn-container btn-success" mat-raised-button color="primary" 
+            [disabled]="!canDownload"
+            (click)="downloadFile()">
+            Download results
+        </button>
+
+    </div>
+
+    <!--vehicles table-->
+    <h3>Vehicles</h3>
+    <div class="flex-container">
+
+        <table mat-table [dataSource]="vehicles" class="mat-elevation-z10">
+
+            <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef>Id</th>
+                <td mat-cell *matCellDef="let element">{{ element.id }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Name</th>
+                <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="vehiclesColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: vehiclesColumns"></tr>
+        </table>
+
+    </div>
+
+    <!--locations table-->
+    <h3>Locations</h3>
+    <div class="flex-container">
+
+        <table mat-table [dataSource]="locations" class="mat-elevation-z10">
+
+            <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef>Id</th>
+                <td mat-cell *matCellDef="let element">{{ element.id }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Name</th>
+                <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="locationsColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: locationsColumns"></tr>
+        </table>
+
+    </div>
+</div>

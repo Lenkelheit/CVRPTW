@@ -1,8 +1,9 @@
 ﻿using RabbitMQ.Client;
+using QueueService.Interfaces;
 
 namespace QueueService.QueueServices
 {
-    public class ConnectionProvider : Interfaces.IConnectionProvider
+    public class ConnectionProvider : IConnectionProvider
     {
         // FIELDS
         private readonly IConnectionFactory connectionFactory;
@@ -14,11 +15,11 @@ namespace QueueService.QueueServices
         }
         
         // METHODS
-        public Interfaces.IConsumer Connect(Models.Settings settings)
+        public IConsumer Connect(Models.Settings settings)
         {
             return new Consumer(connectionFactory, settings);
         }
-        public Interfaces.IProducer Open(Models.Settings settings)
+        public IProducer Open(Models.Settings settings)
         {
             return new Producer(connectionFactory, settings);
         }

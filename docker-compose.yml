@@ -1,0 +1,48 @@
+version: '3.3'
+
+services:
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: 'rabbitmq'
+    environment:
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+    ports:
+      - '15672:15672'
+      - '5672:5672'
+
+  or-tools:
+    build:
+      context: ./backend
+      dockerfile: ./OR-Tools/Dockerfile
+    container_name: 'or-tools'
+    restart: on-failure
+    environment:
+      RabbitMq:HostName: ${RabbitMqHost}
+    depends_on:
+      - rabbitmq
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: ./API/Dockerfile
+    container_name: 'api'
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      ASPNETCORE_URLS: http://+:5000
+      CORS:AllowedOrigin: ${ClientAddress}
+      RabbitMq:HostName: ${RabbitMqHost}
+    depends_on:
+      - rabbitmq
+      - or-tools
+
+  angular:
+    build: ./frontend/Angular
+    container_name: 'angular-client'
+    ports:
+      - "4200:80"
+    depends_on:
+      - api  
