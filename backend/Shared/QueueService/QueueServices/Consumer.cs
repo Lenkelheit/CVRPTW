@@ -10,8 +10,8 @@ namespace QueueService.QueueServices
     public class Consumer : IConsumer
     {
         // FIELDS        
-        private ISubscription subscription;
-        private IBroker broker;
+        private readonly ISubscription subscription;
+        private readonly IBroker broker;
 
         // CONSTRUCTORS
         public Consumer(IConnectionFactory connectionFactory, Settings settings)

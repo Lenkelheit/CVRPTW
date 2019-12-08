@@ -24,6 +24,7 @@ namespace API.Services
                 Vehicles = excelMapper.Fetch<Vehicles>(nameof(Vehicles)).ToArray()
             };
         }
+
         #region Save
         public byte[] Save(FileOutput fileOutput)
         {

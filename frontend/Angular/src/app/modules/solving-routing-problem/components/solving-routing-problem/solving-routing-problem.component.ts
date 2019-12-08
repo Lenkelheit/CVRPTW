@@ -1,8 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { HubConnectionBuilder, HubConnection } from '@aspnet/signalr';
+
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
 import { NotificationBarComponent } from 'src/app/shared/components/notification-bar/notification-bar.component';
 import { FileOperationService } from 'src/app/services/file-operation.service';
+import { environment as API } from 'src/environments/environment';
 
 @Component({
     selector: 'app-solving-routing-problem',
@@ -11,40 +16,46 @@ import { FileOperationService } from 'src/app/services/file-operation.service';
 })
 export class SolvingRoutingProblemComponent implements OnInit, OnDestroy {
 
-    private hubConnection: HubConnection;
-
-    public columnsToDisplay: string[] = ['id', 'name'];
+    public vehiclesColumns: string[] = ['id', 'name'];
     public vehicles = [];
 
-    public ToDisplay: string[] = ['id', 'name'];
+    public locationsColumns: string[] = ['id', 'name'];
     public locations = [];
 
     public fileToUpload: File;
     public canDownload: boolean;
 
-    constructor(public fileOperationService: FileOperationService, public snackBar: MatSnackBar) { }
+    private $unsubscribe = new Subject<void>();
+    private hubConnection: HubConnection;
+    constructor(
+        private fileOperationService: FileOperationService,
+        private snackBar: MatSnackBar) { }
 
-    public ngOnInit() {
+    public ngOnInit(): void {
         this.registerHub();
     }
 
-    private registerHub() {
-        this.hubConnection = new HubConnectionBuilder().withUrl('http://localhost:5000/or-tools').build();
-        this.hubConnection.start().catch((error) => {
-            console.log('isSolved', error);
+    private registerHub(): void {
+        this.hubConnection = new HubConnectionBuilder().withUrl(`${API.apiUrl}/${API.orToolsHub}`).build();
+        this.hubConnection.start().catch(() =>
+            this.openNotificationBar('Error occurred with connection to server.', 'notification-error')
+        );
 
-            this.openNotificationBar('Error occurred with connection to server.', 'notification-error');
-        });
-
-        this.hubConnection.on('IsSolved', (isSolved: boolean) => {
-            this.canDownload = isSolved;
-            this.openNotificationBar('Success! Results are ready for downloading.', 'notification-success');
-            console.log('isSolved', isSolved);
-        });
+        this.hubConnection.on('IsSolved', this.isOperationSolved.bind(this));
     }
 
     public ngOnDestroy(): void {
         this.hubConnection.stop();
+
+        this.$unsubscribe.next();
+        this.$unsubscribe.complete();
+    }
+
+    public isOperationSolved(isSolved: boolean) {
+        this.canDownload = isSolved;
+
+        if (isSolved) this.openNotificationBar('Success! Results are ready for downloading.', 'notification-success');
+        else          this.openNotificationBar('Solution is not found.', 'notification-error');
     }
 
     public openFileInput() {
@@ -56,24 +67,31 @@ export class SolvingRoutingProblemComponent implements OnInit, OnDestroy {
     }
 
     public uploadFile() {
-        this.fileOperationService.uploadFile(this.fileToUpload).subscribe(dataResp => {
-            this.vehicles = dataResp.body.vehicles;
-            this.locations = dataResp.body.locations;
-            console.log(dataResp.body);
-        },
+        this
+        .fileOperationService
+        .uploadFile(this.fileToUpload)
+        .pipe(takeUntil(this.$unsubscribe))
+        .subscribe(
+            dataResp => {
+                this.vehicles = dataResp.body.vehicles;
+                this.locations = dataResp.body.locations;
+            },
             () =>
-                this.openNotificationBar('Error occurred with uploading file.', 'notification-error')
-        );
+                this.openNotificationBar('Error occurred with uploading file.', 'notification-error'));
     }
 
     public downloadFile() {
-        this.fileOperationService.downloadFile('blob').subscribe(fileResp => {
-            this.saveAs(fileResp.body, 'Results.xlsx');
-            this.canDownload = false;
-        },
+        this
+        .fileOperationService
+        .downloadFile('blob')
+        .pipe(takeUntil(this.$unsubscribe))
+        .subscribe(
+            fileResp => {
+                this.saveAs(fileResp.body, 'Results.xlsx');
+                this.canDownload = false;
+            },
             () =>
-                this.openNotificationBar('Error occurred with downloading file.', 'notification-error')
-        );
+                this.openNotificationBar('Error occurred with downloading file.', 'notification-error'));
     }
 
     private saveAs(blob: Blob, fileName: string) {
@@ -82,9 +100,7 @@ export class SolvingRoutingProblemComponent implements OnInit, OnDestroy {
         const link = document.createElement('a');
         link.setAttribute('href', url);
         link.setAttribute('download', fileName);
-        document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
     }
 
     private openNotificationBar(message: string, panelClass: string) {

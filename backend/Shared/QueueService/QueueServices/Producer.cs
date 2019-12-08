@@ -11,8 +11,7 @@ namespace QueueService.QueueServices
     {
         // FIELDS
         private readonly PublicationAddress publicationAddress;
-
-        private IBroker broker;
+        private readonly IBroker broker;
 
         // CONSTRUCTORS
         public Producer(IConnectionFactory connectionFactory, Settings settings)

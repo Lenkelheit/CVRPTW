@@ -1,71 +1,60 @@
-﻿using Domains.Models.Input;
-using Domains.Models.Output;
-using Microsoft.Extensions.Configuration;
+﻿using OR_Tools.Models;
+using OR_Tools.Solvers;
+using OR_Tools.Interfaces;
+
 using QueueService.Interfaces;
-using QueueService.Models;
 using QueueService.QueueServices;
-using RabbitMQ.Client;
+
 using System;
-using System.Collections.Generic;
+using System.Threading;
+
+using Microsoft.Extensions.Configuration;
+
+using RabbitMQ.Client;
 
 namespace OR_Tools
 {
-    class Program
+    internal class Program
     {
-        
-        static void Main(string[] args)
+        private static readonly int MAX_REQUEST_TIMEOUT = 2500;
+
+        public static void Main(string[] args)
         {
-            IConfiguration configuration = new ConfigurationBuilder()
-                                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                                .AddJsonFile("appsettings.json")
-                                .Build();
+            IConfiguration configuration = GetConfiguration();
+            IConnectionProvider connectionProvider = GetConnectionProvider(configuration);
+            MessageSettings messageSettings = GetSettings(configuration);
+            ISolver solver = GetSolver();
+            CancellationToken cancellationToken = new CancellationToken();
 
-            IConnectionFactory connectionFactory = new DefaultConnectionFactory();
-            IConnectionProvider connectionProvider = new ConnectionProvider(connectionFactory);
-
-
-            Settings settings1 = new Settings();
-            configuration.Bind("RabbitMq:FileData", settings1);
-            Settings settings2 = new Settings();
-            configuration.Bind("RabbitMq:Result", settings2);
-            Settings settings3 = new Settings();
-            configuration.Bind("RabbitMq:IsSolved", settings3);
-            using (IConsumer consumer = connectionProvider.Connect(settings1))
-            using (IProducer producerResult = connectionProvider.Open(settings2))
-            using (IProducer producerIsSolved = connectionProvider.Open(settings3))
+            using (Bootstrapper bootstrapper = new Bootstrapper(connectionProvider, messageSettings, solver))
             {
-                while (true)
-                {
-                    ReceiveData receiveData = consumer.Receive(2500);
-
-                    if (receiveData != null)
-                    {
-                        FileInput fileInput = receiveData.GetObject<FileInput>();
-
-                        // get data
-                        Console.Write("get file input data");
-                        consumer.SetAcknowledge(receiveData.DeliveryTag, true);
-
-                        // solve
-                        var orToolsConverter = new OrToolsConverter();
-                        var data = orToolsConverter.ConvertToData(fileInput);
-                        var solver = new ORSolver(data);
-                        solver.Solve();
-                        bool hasSolution = solver.PrintSolution();
-                        FileOutput solved = hasSolution ? orToolsConverter.ConvertToFileOutput(solver) : new FileOutput()
-                        {
-                            DroppedLocation = new List<Dropped>(),
-                            Itineraries = new List<Itineraries>(),
-                            Summaries = new List<Summary>(),
-                            Totals = new List<Totals>()
-                        };
-
-                        // put in queue
-                        producerIsSolved.Send(true);
-                        producerResult.Send(solved);
-                    }
-                }
+                bootstrapper.Run(cancellationToken, MAX_REQUEST_TIMEOUT);
             }
+        }
+
+        private static IConfiguration GetConfiguration()
+        {
+            return new ConfigurationBuilder()
+                        .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                        .AddJsonFile("appsettings.json")
+                        .AddEnvironmentVariables()
+                        .Build();
+        }
+
+        private static MessageSettings GetSettings(IConfiguration configuration)
+        {
+            return configuration.GetSection("RabbitMq").Get<MessageSettings>();
+        }
+
+        private static IConnectionProvider GetConnectionProvider(IConfiguration configuration)
+        {
+            string hostName = configuration.GetValue<string>("RabbitMq:HostName");
+            IConnectionFactory connectionFactory = new DefaultConnectionFactory(hostName);
+            return new ConnectionProvider(connectionFactory);
+        }
+        private static ISolver GetSolver()
+        {
+            return new OrToolsSolver();
         }
     }
 }

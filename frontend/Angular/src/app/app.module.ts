@@ -4,7 +4,7 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { SharedModule } from './shared/shared.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { SolvingRoutingProblemModule } from './modules/solving-routing-problem/solving-routing-problem.module';
+import { SolvingRoutingProblemModule } from 'src/app/modules';
 import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
@@ -19,7 +19,6 @@ import { HttpClientModule } from '@angular/common/http';
         BrowserAnimationsModule,
         HttpClientModule
     ],
-    providers: [],
     bootstrap: [AppComponent]
 })
 export class AppModule { }
