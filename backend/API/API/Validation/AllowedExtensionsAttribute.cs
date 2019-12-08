@@ -8,11 +8,11 @@ namespace API.Validation
 {
     public class AllowedExtensionsAttribute : ValidationAttribute
     {
-        private readonly ISet<string> extensions;
+        private readonly ISet<string> allowedExtensions;
 
         public AllowedExtensionsAttribute(string[] extensions)
         {
-            this.extensions = new HashSet<string>(extensions);
+            this.allowedExtensions = new HashSet<string>(extensions);
         }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
@@ -21,7 +21,7 @@ namespace API.Validation
             {
                 string fileExtension = Path.GetExtension(file.FileName);
 
-                if (!extensions.Contains(fileExtension.ToLower()))
+                if (!allowedExtensions.Contains(fileExtension.ToLower()))
                 {
                     return new ValidationResult(GetErrorMessage());
                 }

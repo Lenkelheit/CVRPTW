@@ -12,13 +12,7 @@ namespace API
     {
         public Startup(IHostingEnvironment hostingEnvironment)
         {
-            IConfigurationBuilder builder = new ConfigurationBuilder()
-                .SetBasePath(hostingEnvironment.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{hostingEnvironment.EnvironmentName}.json", reloadOnChange: true, optional: true)
-                .AddEnvironmentVariables();
-
-            Configuration = builder.Build();
+            Configuration = ServicesConfiguration.BuildConfiguration(hostingEnvironment);
         }
 
         public IConfiguration Configuration { get; }
@@ -28,6 +22,7 @@ namespace API
             services.AddSwagger(Configuration);
             services.AddBusinessLogicServices(Configuration);
             services.AddBackgroundsServices(Configuration);
+            services.AddQueueSettings(Configuration);
             services.AddMessageServices(Configuration);
             services.AddSignalR();
             services.AddCors();
@@ -46,7 +41,7 @@ namespace API
             }
 
             app.UseSwagger();
-            app.UseCors(builder => builder.AllowAnyMethod().AllowAnyHeader().AllowCredentials().WithOrigins("http://localhost:4200"));
+            app.UseCORS(Configuration);
             app.UseMvc();
 
             app.UseSignalR(routes =>

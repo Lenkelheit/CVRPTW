@@ -1,8 +1,8 @@
-﻿using Domains.Models.Output;
-using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
+using QueueService.Models;
 using QueueService.Interfaces;
 
 using System.Threading;
@@ -12,16 +12,12 @@ namespace API.HostedServices
 {
     public class IsSolvedService : BackgroundService
     {
-        IHubContext<Hubs.OrToolsHub> hubContext;
-        IConsumer consumer;
+        private readonly IHubContext<Hubs.OrToolsHub> hubContext;
+        private readonly IConsumer consumer;
 
-        public IsSolvedService(IHubContext<Hubs.OrToolsHub> hubContext, IConnectionProvider factory, IConfiguration configuration)
+        public IsSolvedService(IHubContext<Hubs.OrToolsHub> hubContext, IConnectionProvider factory, IOptionsMonitor<Settings> options)
         {
-            QueueService.Models.Settings settings = new QueueService.Models.Settings();
-            configuration.Bind("RabbitMq:IsSolved", settings);
-
-            this.consumer = factory.Connect(settings);
-
+            this.consumer = factory.Connect(options.Get("IsSolvedQueue"));
             this.hubContext = hubContext;
         }
 
@@ -35,7 +31,7 @@ namespace API.HostedServices
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                QueueService.Models.ReceiveData receiveData = await Task.Run(() => consumer.Receive(2500));
+                ReceiveData receiveData = await Task.Run(() => consumer.Receive(2500));
 
                 if (receiveData != null)
                 {

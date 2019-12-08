@@ -13,8 +13,8 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class RoutingController : ControllerBase
     {
-        FileService fileService;
-        MessageService messageService;
+        private readonly FileService fileService;
+        private readonly MessageService messageService;
 
         public RoutingController(FileService fileService, MessageService messageService)
         {
@@ -23,7 +23,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public ActionResult<FileInput> Post([AllowedExtensions(new string[] { ".xlsx" })]IFormFile file)
+        public ActionResult<FileInput> Post([AllowedExtensions(new [] { ".xlsx" })]IFormFile file)
         {
             FileInput fileData; 
             try
@@ -44,13 +44,12 @@ namespace API.Controllers
         public FileContentResult Download()
         {
             string fileName = "Results.xlsx";
+            string fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
             FileOutput fileOutput = messageService.DequeueData();
             byte[] fileContent = fileService.Save(fileOutput);
 
-            return File(
-                fileContent,
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                fileName);
+            return File(fileContent, fileType, fileName);
         }
     }
 }

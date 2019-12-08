@@ -1,6 +1,6 @@
 ﻿using Domains.Models.Input;
 using Domains.Models.Output;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using QueueService.Interfaces;
 using QueueService.Models;
 
@@ -8,20 +8,20 @@ namespace API.Services
 {
     public class MessageService
     {
-        IConnectionProvider factory;
-        IConfiguration configuration;
+        private readonly IConnectionProvider factory;
+        private readonly Settings postFileSetting;
+        private readonly Settings downloadFileSetting;
 
-        public MessageService(IConnectionProvider factory, IConfiguration configuration)
+        public MessageService(IConnectionProvider factory, IOptionsSnapshot<Settings> options)
         {
             this.factory = factory;
-            this.configuration = configuration;
+            this.postFileSetting = options.Get("PostFileQueue");
+            this.downloadFileSetting = options.Get("DownloadFileQueue");
         }
 
         public void SendFileData(FileInput fileInput)
         {
-            Settings settings = new Settings();
-            configuration.Bind("RabbitMq:FileData", settings);
-            using (IProducer producer = factory.Open(settings))
+            using (IProducer producer = factory.Open(postFileSetting))
             {
                 producer.Send(fileInput);
             }
@@ -29,9 +29,7 @@ namespace API.Services
 
         public FileOutput DequeueData()
         {
-            Settings settings = new Settings();
-            configuration.Bind("RabbitMq:Result", settings);
-            using (IConsumer consumer = factory.Connect(settings))
+            using (IConsumer consumer = factory.Connect(downloadFileSetting))
             {
                 ReceiveData receiveData = consumer.Receive(500);
                 if (receiveData == null) return null;
